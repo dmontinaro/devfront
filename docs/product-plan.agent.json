@@ -1,0 +1,45 @@
+{
+  "schema": "mamemo.visual-plan-handoff.v1",
+  "planId": "devfront-product-plan-v1",
+  "title": "devfront.dev Produkt- und MVP-Plan",
+  "status": "draft",
+  "version": "1.0",
+  "lastUpdated": "2026-08-17",
+  "humanReadableArtifact": "devfront-product-plan-v1.html",
+  "sidecarArtifact": "devfront-product-plan-v1.agent.json",
+  "agentInstruction": "Read the JSON sidecar first. Use the HTML only for human and visual context.",
+  "project": "devfront.dev",
+  "goal": "Validate that real development work can create a motivating visible basebuilding loop.",
+  "summary": "Build a focused 2D personal-base vertical slice before GitHub automation, worlds, guilds, 3D or monetization.",
+  "decisions": [
+    {"id": "D1", "decision": "Base is the product center, mission board is utility.", "rationale": "Visible world growth is the primary emotional reward."},
+    {"id": "D2", "decision": "Start with a 2D vertical slice.", "rationale": "Validate the reward loop before expensive 3D or multiplayer work."},
+    {"id": "D3", "decision": "Use hybrid work verification.", "rationale": "GitHub is the gold standard but real work can be private."}
+  ],
+  "constraints": [
+    "Real work output must remain central",
+    "MVP missions represent roughly 1 to 4 hours",
+    "Completion produces skill XP, resources and visible base progress"
+  ],
+  "doNotDo": [
+    "No 3D world in MVP",
+    "No guilds or PvP in MVP",
+    "No global leaderboard",
+    "No tokens or play-to-earn",
+    "No replacement for GitHub Issues"
+  ],
+  "implementationSequence": [
+    {"id": "P0", "title": "Playable Base Prototype", "status": "next", "effort": "M", "description": "Create a clickable 2D base, mission selection and reward sequence.", "acceptanceCriteria": ["Core loop is understandable without explanation", "At least three mission types work", "Completion visibly changes a building"], "dependsOn": []},
+    {"id": "P1", "title": "Five-user loop test", "status": "planned", "effort": "S", "description": "Observe comprehension and motivation with five target users.", "acceptanceCriteria": ["Users identify the next base goal", "Users can choose a mission", "Feedback distinguishes useful progress from cosmetic points"], "dependsOn": ["P0"]},
+    {"id": "P2", "title": "MVP domain model", "status": "planned", "effort": "M", "description": "Model missions, evidence, rewards, resources, skills, buildings and upgrades.", "acceptanceCriteria": ["Model supports manual and GitHub-verified missions", "Reward rules are auditable", "No multiplayer assumptions leak into MVP"], "dependsOn": ["P1"]}
+  ],
+  "risks": [
+    "Reward may feel cosmetic",
+    "XP farming may displace quality",
+    "Agent work attribution is ambiguous",
+    "Game layer may detach from actual work"
+  ],
+  "sourceArtifacts": ["Devfront grill session, June 2026", "Devfront vision paper, June 2026"],
+  "repoAreasMentioned": [],
+  "handoffPrompt": "Build the devfront.dev playable 2D vertical slice described in this plan. Start with the base-centered core loop. Do not add 3D, guilds, PvP, monetization or a global leaderboard. Verify the completion reward visibly changes the base."
+}

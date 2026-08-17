@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>devfront.dev — Vision Paper</title>
+  <style>
+    :root {
+      --bg: #090d12;
+      --panel: #101823;
+      --panel-2: #142033;
+      --text: #edf4ff;
+      --muted: #a9b8cc;
+      --line: rgba(255,255,255,.12);
+      --accent: #73e0b6;
+      --accent-2: #8bb7ff;
+      --warn: #ffd37a;
+      --danger: #ff8d8d;
+      --shadow: 0 24px 70px rgba(0,0,0,.42);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(115,224,182,.18), transparent 30%),
+        radial-gradient(circle at 86% 10%, rgba(139,183,255,.20), transparent 35%),
+        linear-gradient(180deg, #080b10 0%, var(--bg) 48%, #07090d 100%);
+      color: var(--text);
+      font: 16px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    a { color: var(--accent); }
+    .wrap { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+    header { padding: 72px 0 44px; }
+    .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: .16em; font-size: 12px; font-weight: 800; }
+    h1 { font-size: clamp(46px, 8vw, 92px); line-height: .92; margin: 18px 0 18px; letter-spacing: -.06em; }
+    .lead { font-size: clamp(20px, 3vw, 30px); line-height: 1.2; max-width: 880px; color: #d8e7fb; margin: 0; }
+    .sublead { max-width: 760px; color: var(--muted); font-size: 18px; margin-top: 24px; }
+    .hero-card { margin-top: 36px; padding: 28px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(16,24,35,.74); box-shadow: var(--shadow); backdrop-filter: blur(16px); }
+    .grid { display: grid; gap: 18px; }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .card { padding: 24px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)); }
+    .card h3 { margin: 0 0 8px; font-size: 20px; }
+    .card p, .card li { color: var(--muted); }
+    section { padding: 34px 0; }
+    h2 { font-size: clamp(30px, 4vw, 48px); line-height: 1.04; letter-spacing: -.04em; margin: 0 0 18px; }
+    h3 { letter-spacing: -.02em; }
+    .section-intro { color: var(--muted); font-size: 18px; max-width: 820px; margin: 0 0 24px; }
+    .pill { display: inline-flex; gap: 8px; align-items: center; padding: 8px 12px; border-radius: 99px; border: 1px solid var(--line); color: #dceaff; background: rgba(255,255,255,.055); font-weight: 700; font-size: 13px; }
+    .pills { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 0; }
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 20px; }
+    .step { min-height: 130px; padding: 18px; border-radius: 18px; border: 1px solid var(--line); background: rgba(20,32,51,.72); position: relative; }
+    .step strong { color: var(--accent); display: block; margin-bottom: 8px; }
+    .step span { color: var(--muted); font-size: 14px; }
+    .quote { font-size: clamp(24px, 3vw, 38px); line-height: 1.16; letter-spacing: -.035em; padding: 30px; border-left: 5px solid var(--accent); background: rgba(115,224,182,.08); border-radius: 0 22px 22px 0; }
+    .matrix { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 18px; border: 1px solid var(--line); }
+    .matrix th, .matrix td { text-align: left; padding: 15px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .matrix th { background: rgba(139,183,255,.12); color: #eaf2ff; }
+    .matrix td { color: var(--muted); background: rgba(255,255,255,.025); }
+    .matrix tr:last-child td { border-bottom: 0; }
+    .highlight { color: var(--accent); font-weight: 800; }
+    .muted { color: var(--muted); }
+    .warning { color: var(--warn); }
+    .roadmap { counter-reset: phase; }
+    .phase { position: relative; padding: 24px 24px 24px 72px; margin-bottom: 14px; border: 1px solid var(--line); border-radius: 20px; background: rgba(16,24,35,.70); }
+    .phase:before { counter-increment: phase; content: counter(phase); position: absolute; left: 22px; top: 24px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #06110d; font-weight: 900; }
+    .phase h3 { margin: 0 0 6px; }
+    .phase p { margin: 0; color: var(--muted); }
+    footer { padding: 50px 0 80px; color: var(--muted); }
+    @media (max-width: 860px) {
+      .grid-3, .grid-2, .flow { grid-template-columns: 1fr; }
+      header { padding-top: 44px; }
+    }
+    @media print {
+      body { background: white; color: #111; }
+      .card, .hero-card, .phase, .step, .matrix td { background: white; box-shadow: none; }
+      .muted, .card p, .card li, .section-intro, .sublead, .matrix td, .phase p, .step span { color: #333; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <div class="eyebrow">Vision Paper · Arbeitsstand</div>
+    <h1>devfront.dev</h1>
+    <p class="lead">Ein Anno-/Sandbox-City-Builder für echte Dev-Arbeit: Missionen, Skills, Guilds und sichtbarer Fortschritt — gebaut als Open-Source-Vertrauensanker.</p>
+    <p class="sublead">Nicht „Jira mit XP“. Nicht „Coding-Lernspiel“. Nicht „Play-to-earn“. Die Kernfantasie: Du baust keine Fantasie-Stadt durch Klicks, sondern eine technische Welt durch echte Arbeit.</p>
+    <div class="hero-card">
+      <div class="quote">Real work → visible progress → better missions → stronger base.</div>
+      <div class="pills">
+        <span class="pill">MVP: persönliche Base/Kolonie</span>
+        <span class="pill">Später: Welten, Planeten, Universen</span>
+        <span class="pill">GitHub-verifiziert + private Missionen</span>
+        <span class="pill">Open-source entwickelt</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section>
+      <h2>1. Kernthese</h2>
+      <p class="section-intro">devfront macht produktive Entwicklungsarbeit emotional sichtbar. Der wichtigste Reward ist nicht Status, Geld oder ein Badge, sondern das Gefühl: <span class="highlight">Meine echte Arbeit baut etwas Sichtbares auf.</span></p>
+      <div class="grid grid-3">
+        <div class="card"><h3>Primärer Reward</h3><p>Die eigene Base/Welt wächst sichtbar. Das ist das Herz des Produkts.</p></div>
+        <div class="card"><h3>Stützende Rewards</h3><p>Skillentwicklung und Guild-/Team-Aufbau geben Tiefe und langfristige Motivation.</p></div>
+        <div class="card"><h3>Nebenprodukte</h3><p>Mission Discovery ist Utility. Reputation und Status entstehen nebenbei durch echte, verifizierte Arbeit.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Produkt-Identität</h2>
+      <table class="matrix">
+        <thead><tr><th>Es ist</th><th>Es ist nicht</th></tr></thead>
+        <tbody>
+          <tr><td>Ein Motivationstool für AI-affine und produktive Entwickler.</td><td>Ein oberflächliches Gamification-Plugin für Tickets.</td></tr>
+          <tr><td>Ein Basebuilding-/City-Builder-Layer über echter Arbeit.</td><td>Ein RPG mit zufälligen Quests und kosmetischen Badges.</td></tr>
+          <tr><td>Ein offenes Ökosystem mit privaten und öffentlichen Welten.</td><td>Nur eine Open-Source-Contribution-Plattform.</td></tr>
+          <tr><td>Open-source entwickelt, damit Akzeptanz und Vertrauen entstehen.</td><td>Ein geschlossenes Recruiting- oder Bounty-Tool als Startpunkt.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. Weltmodell</h2>
+      <p class="section-intro">Der MVP startet klein und emotional greifbar: eine persönliche Base/Kolonie. Die kosmische Ebene kommt später als Meta-Layer.</p>
+      <div class="flow">
+        <div class="step"><strong>1 · Base</strong><span>Persönliche Kolonie als Home.</span></div>
+        <div class="step"><strong>2 · Gebäude</strong><span>Workshops, Archive, Shield, Automation Lab, Guild Gate.</span></div>
+        <div class="step"><strong>3 · Regionen</strong><span>Projektbereiche werden sichtbare Zonen.</span></div>
+        <div class="step"><strong>4 · Welten</strong><span>Repos, Communities, Teams, Themen als Welten.</span></div>
+        <div class="step"><strong>5 · Universen</strong><span>Verknüpfte öffentliche/private Systeme.</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>4. Arbeits-Input</h2>
+      <p class="section-intro">devfront darf nicht nur Open Source abbilden. Gleichzeitig braucht es Vertrauenssignale. Darum gilt: GitHub-verifizierte Arbeit ist Goldstandard, private Missionen bleiben möglich.</p>
+      <div class="grid grid-3">
+        <div class="card"><h3>Gold Progress</h3><p>PR merged, Issue closed, Review approved, Tests passed, Deployment, CI-Signale. Öffentlich/verifiziert und stärker gewichtet.</p></div>
+        <div class="card"><h3>Private Progress</h3><p>Manuelle Missionen für Kundenarbeit, internes Projekt, Lernaufgabe oder Agent-Workflow. Zählt für die Base, aber anders markiert.</p></div>
+        <div class="card"><h3>Guided Progress</h3><p>Empfohlene Missionen auf Basis von Skills, Stack, Zielen, Base-Ausbau und optionaler GitHub-Historie.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>5. Mission-System</h2>
+      <p class="section-intro">Eine MVP-Mission ist eine echte 1–4h-Arbeitseinheit. Größere Arbeit wird später als Campaign aus mehreren Missionen dargestellt.</p>
+      <table class="matrix">
+        <thead><tr><th>Typ</th><th>Umfang</th><th>Beispiele</th><th>Reward-Prinzip</th></tr></thead>
+        <tbody>
+          <tr><td>Small Mission</td><td>15–60 Minuten</td><td>Docs-Fix, Bug reproduzieren, Issue triagieren</td><td>Kleine XP/Ressourcen, schneller Momentum-Gewinn</td></tr>
+          <tr><td>Standard Mission</td><td>1–4 Stunden</td><td>Bugfix, Test ergänzen, kleiner Feature-Slice, UI-Anpassung</td><td>MVP-Standard: echter Fortschritt ohne Overhead</td></tr>
+          <tr><td>Major Mission</td><td>0.5–2 Tage</td><td>Integration, Modul-Refactor, größeres Feature</td><td>Mehr XP, stärkere Verifikation, höherer Impact</td></tr>
+          <tr><td>Campaign</td><td>Mehrere Missionen</td><td>„Checkout stabilisieren“, „AI Review Pipeline bauen“</td><td>Zusätzlicher Abschlussbonus und sichtbarer Weltfortschritt</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">Reward-Formel als Designregel: XP/Ressourcen entstehen aus Umfang × Schwierigkeit × Wichtigkeit × Verifikation × Qualität × Impact — nicht nur aus Zeit.</p>
+    </section>
+
+    <section>
+      <h2>6. Basebuilding-System</h2>
+      <p class="section-intro">Jede abgeschlossene Mission erzeugt drei Dinge: <span class="highlight">Skill XP + Ressourcen + sichtbaren Fortschritt an Base/Gebäude.</span></p>
+      <div class="grid grid-3">
+        <div class="card"><h3>Build</h3><p>Code, Features, Implementation, UI, Produktarbeit. Gebäude: Workshop / Forge / Construction Yard.</p></div>
+        <div class="card"><h3>Stability</h3><p>Tests, Bugfixes, QA, Security, Reliability. Gebäude: Shield / QA Tower / Defense Grid.</p></div>
+        <div class="card"><h3>Knowledge</h3><p>Docs, Research, Architektur, Entscheidungen, Tutorials. Gebäude: Archive / Library / Observatory.</p></div>
+        <div class="card"><h3>Trust</h3><p>Reviews, Mentoring, Zusammenarbeit, Kommunikation, verifizierte Beiträge. Gebäude: Signal Tower / Embassy / Guild Hall.</p></div>
+        <div class="card"><h3>Automation</h3><p>AI-Workflows, DevOps, CI/CD, Agents, Tooling. Gebäude: Automation Lab / Engine Core / Drone Bay.</p></div>
+        <div class="card"><h3>Beispiel</h3><p>„Test für Login-Flow schreiben“ → +Testing XP, +Stability, +Trust, Shield-Gebäude wächst sichtbar.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>7. UX-Prinzip</h2>
+      <p class="section-intro">Die Base ist der Mittelpunkt. Das Missionboard ist nicht das Produktzentrum, sondern die Quelle für Wege zum nächsten Ausbau.</p>
+      <div class="card">
+        <h3>Startscreen-Logik</h3>
+        <p><strong>Next Base Goal:</strong> Upgrade Shield to Level 2</p>
+        <p><strong>Dafür brauchst du:</strong> 40 Stability + 20 Trust</p>
+        <p><strong>Empfohlene Missionen:</strong> Test für Auth Flow · Flaky CI Step fixen · Offenen PR reviewen</p>
+        <p><strong>Alternative:</strong> Freies Missionboard öffnen</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>8. Onboarding</h2>
+      <p class="section-intro">MVP-Onboarding: schnell rein über Selbstauswahl. GitHub-Analyse später als Magic Moment, nicht als harte Einstiegshürde.</p>
+      <div class="flow">
+        <div class="step"><strong>1 · Rolle</strong><span>Frontend, Backend, Fullstack, AI/Agents, DevOps, Docs.</span></div>
+        <div class="step"><strong>2 · Ziel</strong><span>Lernen, Projektarbeit, Open Source, Team/Guild.</span></div>
+        <div class="step"><strong>3 · Base</strong><span>Starter-Kolonie entsteht sofort.</span></div>
+        <div class="step"><strong>4 · Missionen</strong><span>2–3 passende erste Missionen.</span></div>
+        <div class="step"><strong>5 · GitHub</strong><span>Optional verbinden, Historie analysieren, Base anreichern.</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>9. Open Source als Akzeptanzanker</h2>
+      <p class="section-intro">Das Spiel/die Plattform selbst sollte open-source entwickelt werden, damit Entwickler vertrauen, mitgestalten und die Mechaniken akzeptieren. Open Source ist aber nur eine von vielen möglichen Welten.</p>
+      <div class="grid grid-2">
+        <div class="card"><h3>Warum open-source?</h3><ul><li>Vertrauen bei Entwicklern</li><li>Keine Blackbox bei Skill-/Reputationslogik</li><li>Community kann eigene Welten/Integrationen bauen</li><li>Glaubwürdiger Start in Dev-Communities</li></ul></div>
+        <div class="card"><h3>Warum nicht nur Open Source?</h3><ul><li>Dev-Arbeit passiert auch privat, intern und kommerziell</li><li>Guilds und Teams brauchen geschützte Räume</li><li>Spätere Firmenwelten, Sponsoring und Recruiting bleiben möglich</li><li>Produkt wird größer als GoodFirstIssue/CodeTriage</li></ul></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>10. Roadmap-Vorschlag</h2>
+      <div class="roadmap">
+        <div class="phase"><h3>Vision Prototype</h3><p>Clickable HTML/Figma-Prototyp: Base Screen, Mission Card, Reward Moment, Spielerprofil, Missionboard.</p></div>
+        <div class="phase"><h3>MVP Core Loop</h3><p>Selbstauswahl-Onboarding, Starter-Base, manuelle Missionen, einfache Ressourcen, sichtbare Gebäudeprogression.</p></div>
+        <div class="phase"><h3>GitHub Gold Progress</h3><p>GitHub Login, PR-/Issue-/Review-Signale, verifizierte Mission Completion, Profil mit echten Nachweisen.</p></div>
+        <div class="phase"><h3>Open Source World</h3><p>Öffentliches Missionboard für ausgewählte Repos/Themen, GitHub-native Mission Cards, erste Community-Loop.</p></div>
+        <div class="phase"><h3>Guilds & Worlds</h3><p>Gemeinsame Bases, private Welten, öffentliche Welten, Campaigns, später Strategie-/Konkurrenz-Aspekte.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>11. Offene Kernfragen</h2>
+      <div class="grid grid-2">
+        <div class="card"><h3>Game Economy</h3><p>Wie genau werden XP, Ressourcen, Gebäudestufen und Skill-Level balanciert, ohne Grind zu fördern?</p></div>
+        <div class="card"><h3>Verification</h3><p>Welche Signale zählen öffentlich, welche privat, welche nur fürs eigene Guiding?</p></div>
+        <div class="card"><h3>Visual Style</h3><p>Mehr cozy Anno/Siedler, Sci-Fi-Kolonie, Solarpunk-Devbase oder minimalistisches Strategy-Dashboard?</p></div>
+        <div class="card"><h3>Guild Mechanics</h3><p>Wann werden gemeinsame Bases, Rollen, Zusammenschlüsse und Konkurrenz eingeführt?</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <p><strong>Arbeitsstand:</strong> gespeichert als Vision Paper im mamemo-vault. Grundlage: Devfront-Grill-Session Juni 2026.</p>
+  </footer>
+</body>
+</html>
