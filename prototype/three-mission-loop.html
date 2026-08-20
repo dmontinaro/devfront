@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Throwaway logic prototype for three cumulative devfront missions and one world goal."
+    />
+    <title>devfront | Three-mission loop prototype</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%23090b0a%22/%3E%3Cpath d=%22M7 7h18v18H7z%22 fill=%22none%22 stroke=%22%23ff8b4a%22/%3E%3Cpath d=%22M12 12h4a5 5 0 0 1 0 10h-4zm4 0h5v3h-5z%22 fill=%22%23ff8b4a%22/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #090b0a;
+        --panel: #101312;
+        --panel-strong: #151918;
+        --line: #303634;
+        --line-soft: #202523;
+        --text: #eef1ed;
+        --muted: #89918d;
+        --faint: #5e6662;
+        --accent: #ff8b4a;
+        --accent-soft: rgba(255, 139, 74, 0.12);
+        --green: #b8e986;
+        --blue: #7ccfff;
+        --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+      html { min-width: 320px; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background-color: var(--bg);
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+        background-size: 24px 24px;
+        color: var(--text);
+        font-family: var(--sans);
+      }
+
+      button { color: inherit; font: inherit; }
+      button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+      .mono { font-family: var(--mono); }
+
+      .app-header {
+        align-items: center;
+        background: rgba(13, 16, 15, 0.96);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        height: 62px;
+        justify-content: space-between;
+        padding: 0 22px;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+      }
+
+      .brand { align-items: center; display: flex; font: 700 10px var(--mono); gap: 10px; letter-spacing: 0.08em; }
+      .brand-mark { align-items: center; border: 1px solid var(--accent); color: var(--accent); display: flex; height: 32px; justify-content: center; width: 32px; }
+      .system-status { color: var(--faint); display: flex; font: 8px var(--mono); gap: 18px; letter-spacing: 0.08em; }
+      .system-status .online { color: var(--green); }
+
+      .prototype-question {
+        align-items: start;
+        background: #111513;
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 170px minmax(0, 720px);
+        padding: 18px 22px;
+      }
+
+      .prototype-question span { color: var(--accent); font: 8px var(--mono); letter-spacing: 0.12em; text-transform: uppercase; }
+      .prototype-question p { color: #c8ceca; font-size: 13px; line-height: 1.55; margin: 0; }
+
+      .console-layout {
+        display: grid;
+        grid-template-columns: 300px minmax(420px, 1fr) 360px;
+        min-height: calc(100vh - 137px);
+      }
+
+      .mission-column, .state-column { background: rgba(12, 14, 13, 0.92); padding: 20px; }
+      .mission-column { border-right: 1px solid var(--line); }
+      .state-column { border-left: 1px solid var(--line); }
+      .section-label { color: var(--faint); font: 8px var(--mono); letter-spacing: 0.12em; margin: 0 0 14px; text-transform: uppercase; }
+
+      .mission-list { display: grid; gap: 8px; }
+      .mission-card {
+        background: #111413;
+        border: 1px solid var(--line-soft);
+        cursor: pointer;
+        min-height: 122px;
+        padding: 14px;
+        text-align: left;
+        width: 100%;
+      }
+
+      .mission-card:hover:not(:disabled) { border-color: var(--accent); }
+      .mission-card:disabled { cursor: not-allowed; opacity: 0.55; }
+      .mission-card.completed { background: rgba(184, 233, 134, 0.06); border-color: rgba(184, 233, 134, 0.34); opacity: 1; }
+      .mission-card.selected { border-color: var(--accent); box-shadow: inset 3px 0 var(--accent); }
+      .mission-card-top { align-items: center; display: flex; justify-content: space-between; }
+      .mission-type { color: var(--accent); font: 8px var(--mono); letter-spacing: 0.1em; text-transform: uppercase; }
+      .mission-status { color: var(--faint); font: 8px var(--mono); text-transform: uppercase; }
+      .mission-card.completed .mission-status { color: var(--green); }
+      .mission-card strong { display: block; font-size: 12px; line-height: 1.4; margin: 14px 0 9px; }
+      .mission-card small { color: var(--muted); font: 8px/1.5 var(--mono); }
+
+      .scenario-area { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 20px; }
+      .scenario-tabs { display: grid; gap: 5px; grid-template-columns: repeat(3, 1fr); }
+      .scenario-tab {
+        background: transparent;
+        border: 1px solid var(--line-soft);
+        color: var(--muted);
+        cursor: pointer;
+        font: 8px var(--mono);
+        min-height: 40px;
+        padding: 6px;
+        text-transform: uppercase;
+      }
+      .scenario-tab.active { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
+      .scenario-copy { color: var(--muted); font-size: 11px; line-height: 1.5; min-height: 50px; }
+      .guide-action {
+        background: transparent;
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        cursor: pointer;
+        font: 9px var(--mono);
+        min-height: 46px;
+        padding: 10px;
+        text-align: left;
+        width: 100%;
+      }
+      .guide-action:disabled { border-color: var(--line); color: var(--faint); cursor: default; }
+
+      .world-stage { align-items: center; display: flex; justify-content: center; min-height: 650px; overflow: hidden; position: relative; }
+      .world-stage::before { background: radial-gradient(circle, rgba(255, 139, 74, 0.09), transparent 58%); content: ""; inset: 0; position: absolute; }
+      .coordinates { color: var(--faint); font: 7px var(--mono); left: 16px; position: absolute; top: 14px; }
+      .world-map { height: 570px; max-width: 760px; position: relative; width: 92%; }
+      .orbit { border: 1px solid rgba(255, 139, 74, 0.12); border-radius: 50%; left: 50%; position: absolute; top: 50%; transform: translate(-50%, -50%) rotate(-8deg); }
+      .orbit.outer { height: 76%; width: 78%; }
+      .orbit.inner { height: 50%; width: 52%; }
+      .terrain { background: rgba(115, 133, 121, 0.06); border: 1px solid rgba(140, 158, 146, 0.12); border-radius: 48% 28% 44% 31%; height: 36%; left: 31%; position: absolute; top: 31%; transform: rotate(15deg); width: 39%; }
+
+      .world-core {
+        align-items: center;
+        background: #121614;
+        border: 1px solid rgba(255, 139, 74, 0.4);
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        height: 112px;
+        justify-content: center;
+        left: 50%;
+        position: absolute;
+        top: 49%;
+        transform: translate(-50%, -50%);
+        width: 112px;
+        z-index: 5;
+      }
+      .world-core b { color: var(--accent); font: 24px var(--mono); }
+      .world-core small { color: var(--muted); font: 7px var(--mono); text-transform: uppercase; }
+
+      .world-path { background: #303532; height: 2px; left: 50%; position: absolute; top: 49%; transform-origin: left; width: 26%; }
+      .path-testing { transform: rotate(82deg); }
+      .path-debugging { transform: rotate(-28deg); }
+      .path-review { transform: rotate(204deg); }
+      .world-path.active { background: var(--node-color); box-shadow: 0 0 12px var(--node-color); }
+
+      .world-element {
+        align-items: center;
+        color: var(--faint);
+        display: flex;
+        flex-direction: column;
+        font: 8px var(--mono);
+        gap: 9px;
+        position: absolute;
+        text-align: center;
+        text-transform: uppercase;
+        transform: translate(-50%, -50%);
+        width: 150px;
+        z-index: 6;
+      }
+      .world-element.testing { --node-color: var(--green); left: 53%; top: 87%; }
+      .world-element.debugging { --node-color: var(--blue); left: 78%; top: 34%; }
+      .world-element.review { --node-color: var(--accent); left: 20%; top: 34%; }
+      .element-icon { align-items: center; background: #141816; border: 1px solid #424844; display: flex; height: 60px; justify-content: center; position: relative; width: 60px; }
+      .element-icon::before, .element-icon::after { background: #4b524e; content: ""; position: absolute; }
+      .testing .element-icon::before { height: 34px; width: 12px; }
+      .testing .element-icon::after { height: 10px; top: 8px; transform: rotate(45deg); width: 10px; }
+      .debugging .element-icon::before { height: 28px; transform: rotate(45deg); width: 28px; }
+      .debugging .element-icon::after { background: #141816; height: 12px; width: 12px; }
+      .review .element-icon::before { height: 38px; width: 3px; }
+      .review .element-icon::after { border: 1px solid #4b524e; border-radius: 50%; height: 24px; width: 24px; }
+      .world-element.active { color: var(--text); }
+      .world-element.active .element-icon { border-color: var(--node-color); box-shadow: 0 0 28px color-mix(in srgb, var(--node-color) 35%, transparent); }
+      .world-element.active .element-icon::before { background: var(--node-color); box-shadow: 0 0 10px var(--node-color); }
+      .world-element.active .element-icon::after { border-color: var(--node-color); }
+      .element-state { color: var(--faint); }
+      .world-element.active .element-state { color: var(--node-color); }
+
+      .world-complete {
+        background: var(--text);
+        bottom: 18px;
+        color: #101310;
+        display: none;
+        left: 50%;
+        padding: 13px 18px;
+        position: absolute;
+        transform: translateX(-50%);
+        width: min(410px, calc(100% - 32px));
+        z-index: 8;
+      }
+      .world-complete.visible { display: block; }
+      .world-complete small { color: #626a65; display: block; font: 7px var(--mono); margin-bottom: 4px; text-transform: uppercase; }
+      .world-complete strong { font-size: 12px; }
+
+      .state-heading { align-items: center; border-bottom: 1px solid var(--line); display: flex; gap: 10px; margin-bottom: 28px; padding-bottom: 15px; }
+      .state-heading span { color: var(--accent); font: 18px var(--mono); }
+      .state-heading small { color: var(--muted); font: 8px var(--mono); text-transform: uppercase; }
+      .phase-label { color: var(--accent); font: 8px var(--mono); letter-spacing: 0.1em; text-transform: uppercase; }
+      .interaction-panel h1 { font: 500 34px/0.95 var(--mono); letter-spacing: -0.06em; margin: 12px 0 18px; text-transform: uppercase; }
+      .interaction-panel p { color: var(--muted); font-size: 12px; line-height: 1.6; }
+      .primary-action, .secondary-action, .reset-action {
+        border: 1px solid var(--accent);
+        cursor: pointer;
+        font: 9px var(--mono);
+        min-height: 48px;
+        padding: 0 14px;
+        width: 100%;
+      }
+      .primary-action { background: var(--accent); color: #15100c; margin-top: 18px; }
+      .secondary-action { background: transparent; color: var(--accent); margin-top: 10px; }
+      .reset-action { background: transparent; border-color: var(--line); color: var(--muted); margin-top: 12px; }
+      .evidence-log, .reward-grid, .change-card { border: 1px solid var(--line); display: grid; gap: 10px; margin: 22px 0; padding: 15px; }
+      .evidence-log span { color: #c2c9c5; font: 8px var(--mono); }
+      .evidence-log span::before { color: var(--green); content: "✓ "; }
+      .reward-grid > div { align-items: center; border-bottom: 1px solid var(--line-soft); display: flex; justify-content: space-between; padding: 8px 0; }
+      .reward-grid > div:last-child { border: 0; }
+      .reward-grid small { color: var(--muted); font: 8px var(--mono); text-transform: uppercase; }
+      .reward-grid strong { font: 10px var(--mono); }
+      .change-card { border-color: var(--accent); }
+      .change-card small { color: var(--accent); font: 8px var(--mono); text-transform: uppercase; }
+      .change-card strong { font-size: 13px; }
+
+      .state-readout { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 18px; }
+      .state-grid { display: grid; gap: 6px; grid-template-columns: 1fr 1fr; }
+      .state-field { background: #0c0f0e; border: 1px solid var(--line-soft); min-height: 58px; padding: 9px; }
+      .state-field small { color: var(--faint); display: block; font: 7px var(--mono); margin-bottom: 6px; text-transform: uppercase; }
+      .state-field strong { font: 10px var(--mono); }
+      .state-field.wide { grid-column: 1 / -1; }
+      .event-ok { color: var(--green); }
+      .event-rejected { color: #ff7070; }
+
+      @media (max-width: 1080px) {
+        .console-layout { grid-template-columns: 260px minmax(360px, 1fr) 320px; }
+        .world-map { transform: scale(0.86); }
+      }
+
+      @media (max-width: 760px) {
+        .app-header { padding: 0 14px; }
+        .system-status span:not(.online) { display: none; }
+        .prototype-question { grid-template-columns: 1fr; gap: 7px; padding: 14px; }
+        .console-layout { display: flex; flex-direction: column; }
+        .mission-column { border-bottom: 1px solid var(--line); border-right: 0; order: 2; }
+        .world-stage { min-height: 390px; order: 1; }
+        .world-map { height: 480px; min-width: 560px; transform: scale(0.63); }
+        .state-column { border-left: 0; border-top: 1px solid var(--line); order: 3; }
+        .mission-list { grid-template-columns: 1fr; }
+        .mission-card { min-height: 108px; }
+        .scenario-tabs { grid-template-columns: 1fr 1fr 1fr; }
+        .interaction-panel h1 { font-size: 30px; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand"><span class="brand-mark">DF</span> DEVFRONT / FIELD CONSOLE</div>
+      <div class="system-status"><span>WORLD_001</span><span class="online">● ONLINE</span><span>PROTOTYPE_02</span></div>
+    </header>
+
+    <section class="prototype-question" aria-labelledby="prototype-question-label">
+      <span id="prototype-question-label">Question under test</span>
+      <p>Can a player connect three kinds of real work to three distinct world changes while building one cumulative world goal?</p>
+    </section>
+
+    <main class="console-layout">
+      <aside class="mission-column" aria-labelledby="mission-list-label">
+        <h2 class="section-label" id="mission-list-label">Available missions / Free play</h2>
+        <div class="mission-list" id="mission-list"></div>
+
+        <section class="scenario-area" aria-labelledby="scenario-label">
+          <h2 class="section-label" id="scenario-label">Guided walkthroughs</h2>
+          <div class="scenario-tabs" id="scenario-tabs"></div>
+          <p class="scenario-copy" id="scenario-copy"></p>
+          <button class="guide-action" id="guide-action" type="button"></button>
+        </section>
+      </aside>
+
+      <section class="world-stage" aria-label="Frontier world state">
+        <span class="coordinates">48° 12′ N / FRONTIER_EAST / LIVE STATE</span>
+        <div class="world-map">
+          <div class="orbit outer"></div>
+          <div class="orbit inner"></div>
+          <div class="terrain"></div>
+
+          <div class="world-path path-testing" data-path="testing"></div>
+          <div class="world-path path-debugging" data-path="debugging"></div>
+          <div class="world-path path-review" data-path="review"></div>
+
+          <div class="world-core"><b>DF</b><small>World core</small></div>
+
+          <div class="world-element testing" data-element="testing">
+            <span class="element-icon"></span>
+            <strong>Shield Tower</strong>
+            <span class="element-state">Dormant</span>
+          </div>
+          <div class="world-element debugging" data-element="debugging">
+            <span class="element-icon"></span>
+            <strong>Power Relay</strong>
+            <span class="element-state">Unstable</span>
+          </div>
+          <div class="world-element review" data-element="review">
+            <span class="element-icon"></span>
+            <strong>Signal Beacon</strong>
+            <span class="element-state">Offline</span>
+          </div>
+
+          <div class="world-complete" id="world-complete" role="status">
+            <small>Next world goal unlocked</small>
+            <strong>Connect the Northern Archive</strong>
+          </div>
+        </div>
+      </section>
+
+      <aside class="state-column" aria-labelledby="current-step-label">
+        <div class="state-heading"><span id="step-number">01</span><small id="current-step-label">Mission board</small></div>
+        <section class="interaction-panel" id="interaction-panel" aria-live="polite"></section>
+
+        <section class="state-readout" aria-labelledby="state-label">
+          <h2 class="section-label" id="state-label">Current world state</h2>
+          <div class="state-grid" id="state-grid"></div>
+          <button class="reset-action" id="reset-action" type="button">RESET PROTOTYPE</button>
+        </section>
+      </aside>
+    </main>
+
+    <script>
+      // Portable state model. It has no DOM dependencies and can be lifted out of this prototype.
+      const MissionLoop = (() => {
+        const missions = {
+          testing: {
+            id: "testing",
+            type: "Testing",
+            title: "Secure the auth flow with an E2E test",
+            duration: "60 to 90 min",
+            evidence: ["Browser test detected", "4 assertions passed", "Critical path covered"],
+            rewards: { domain: "+18 Stability", skill: "+120 Testing XP", resource: "1 Flux Core" },
+            progress: { stability: 18, trust: 0 },
+            worldElement: "Shield Tower",
+            worldChange: "The Shield Tower protects the eastern settlements.",
+            restingState: "Dormant",
+            activeState: "Protected",
+          },
+          debugging: {
+            id: "debugging",
+            type: "Debugging",
+            title: "Investigate a flaky CI step",
+            duration: "1 to 2 h",
+            evidence: ["Flaky step isolated", "Root cause documented", "Stable CI run recorded"],
+            rewards: { domain: "+15 Stability", skill: "+100 Debugging XP", resource: "1 Energy Cell" },
+            progress: { stability: 15, trust: 0 },
+            worldElement: "Power Relay",
+            worldChange: "The Power Relay restores energy to the frontier path.",
+            restingState: "Unstable",
+            activeState: "Stable",
+          },
+          review: {
+            id: "review",
+            type: "Review",
+            title: "Review an open pull request",
+            duration: "30 min",
+            evidence: ["Review submitted", "Actionable feedback recorded", "Author notified"],
+            rewards: { domain: "+10 Trust", skill: "+80 Review XP", resource: "1 Signal Token" },
+            progress: { stability: 0, trust: 10 },
+            worldElement: "Signal Beacon",
+            worldChange: "The Signal Beacon connects the frontier community.",
+            restingState: "Offline",
+            activeState: "Connected",
+          },
+        };
+
+        function initialState() {
+          return {
+            phase: "mission-board",
+            activeMissionId: null,
+            completedMissionIds: [],
+            stability: 0,
+            trust: 0,
+            nextGoalUnlocked: false,
+            lastEvent: { status: "ready", message: "Choose any available mission." },
+          };
+        }
+
+        function reject(state, message) {
+          return { ...state, lastEvent: { status: "rejected", message } };
+        }
+
+        function reducer(state, action) {
+          if (action.type === "RESET") return initialState();
+
+          if (action.type === "SELECT_MISSION") {
+            if (state.phase !== "mission-board") return reject(state, "Finish the active mission before choosing another.");
+            if (!missions[action.missionId]) return reject(state, "That mission does not exist.");
+            if (state.completedMissionIds.includes(action.missionId)) return reject(state, "Completed missions cannot be repeated.");
+            return {
+              ...state,
+              phase: "evidence",
+              activeMissionId: action.missionId,
+              lastEvent: { status: "accepted", message: `${missions[action.missionId].type} mission selected.` },
+            };
+          }
+
+          if (action.type === "CONFIRM_EVIDENCE") {
+            if (state.phase !== "evidence" || !state.activeMissionId) return reject(state, "No mission evidence is ready to confirm.");
+            return { ...state, phase: "reward", lastEvent: { status: "accepted", message: "Evidence confirmed. Rewards calculated." } };
+          }
+
+          if (action.type === "APPLY_TRANSFORMATION") {
+            if (state.phase !== "reward" || !state.activeMissionId) return reject(state, "No reward is ready to transform the world.");
+            const mission = missions[state.activeMissionId];
+            const completedMissionIds = [...state.completedMissionIds, mission.id];
+            return {
+              ...state,
+              phase: "transformation",
+              completedMissionIds,
+              stability: state.stability + mission.progress.stability,
+              trust: state.trust + mission.progress.trust,
+              nextGoalUnlocked: completedMissionIds.length === Object.keys(missions).length,
+              lastEvent: { status: "accepted", message: `${mission.worldElement} transformed.` },
+            };
+          }
+
+          if (action.type === "CONTINUE") {
+            if (state.phase !== "transformation") return reject(state, "Complete the current transformation first.");
+            return {
+              ...state,
+              phase: state.nextGoalUnlocked ? "world-complete" : "mission-board",
+              activeMissionId: null,
+              lastEvent: {
+                status: "accepted",
+                message: state.nextGoalUnlocked ? "Frontier stabilized. Northern Archive unlocked." : "World state saved for this session.",
+              },
+            };
+          }
+
+          return reject(state, "Unknown action ignored.");
+        }
+
+        return { missions, initialState, reducer };
+      })();
+
+      const scenarios = [
+        {
+          id: "standard",
+          label: "Standard",
+          description: "Complete Testing, Debugging, then Review. Watch each world change remain active.",
+          steps: buildMissionSequence(["testing", "debugging", "review"]),
+        },
+        {
+          id: "reverse",
+          label: "Reverse",
+          description: "Start with Review and finish with Testing. The final world state must stay the same.",
+          steps: buildMissionSequence(["review", "debugging", "testing"]),
+        },
+        {
+          id: "repeat",
+          label: "Repeat guard",
+          description: "Complete Testing, then try to select it again. The state model must reject the repeat.",
+          steps: [
+            ...buildMissionSequence(["testing"]),
+            { label: "Try Testing again", action: { type: "SELECT_MISSION", missionId: "testing" } },
+          ],
+        },
+      ];
+
+      function buildMissionSequence(ids) {
+        return ids.flatMap((missionId) => {
+          const mission = MissionLoop.missions[missionId];
+          return [
+            { label: `Select ${mission.type}`, action: { type: "SELECT_MISSION", missionId } },
+            { label: `Confirm ${mission.type} evidence`, action: { type: "CONFIRM_EVIDENCE" } },
+            { label: `Transform ${mission.worldElement}`, action: { type: "APPLY_TRANSFORMATION" } },
+            { label: "Continue", action: { type: "CONTINUE" } },
+          ];
+        });
+      }
+
+      let state = MissionLoop.initialState();
+      let activeScenarioId = "standard";
+      let scenarioStep = 0;
+
+      const missionList = document.querySelector("#mission-list");
+      const interactionPanel = document.querySelector("#interaction-panel");
+      const stateGrid = document.querySelector("#state-grid");
+      const stepNumber = document.querySelector("#step-number");
+      const currentStepLabel = document.querySelector("#current-step-label");
+      const scenarioTabs = document.querySelector("#scenario-tabs");
+      const scenarioCopy = document.querySelector("#scenario-copy");
+      const guideAction = document.querySelector("#guide-action");
+
+      function dispatch(action, source = "free-play") {
+        state = MissionLoop.reducer(state, action);
+        if (source !== "guide") scenarioStep = 0;
+        render();
+      }
+
+      function render() {
+        renderMissions();
+        renderWorld();
+        renderInteraction();
+        renderState();
+        renderScenarios();
+      }
+
+      function renderMissions() {
+        missionList.innerHTML = Object.values(MissionLoop.missions).map((mission) => {
+          const completed = state.completedMissionIds.includes(mission.id);
+          const selected = state.activeMissionId === mission.id;
+          const unavailable = state.phase !== "mission-board" || completed;
+          const status = completed ? "Completed" : selected ? "Active" : state.phase === "mission-board" ? "Available" : "Waiting";
+          return `
+            <button
+              class="mission-card ${completed ? "completed" : ""} ${selected ? "selected" : ""}"
+              type="button"
+              data-mission-id="${mission.id}"
+              ${unavailable ? "disabled" : ""}
+            >
+              <span class="mission-card-top"><span class="mission-type">${mission.type}</span><span class="mission-status">${status}</span></span>
+              <strong>${mission.title}</strong>
+              <small>${mission.duration} / ${mission.rewards.domain}</small>
+            </button>`;
+        }).join("");
+      }
+
+      function renderWorld() {
+        Object.values(MissionLoop.missions).forEach((mission) => {
+          const active = state.completedMissionIds.includes(mission.id);
+          const element = document.querySelector(`[data-element="${mission.id}"]`);
+          const path = document.querySelector(`[data-path="${mission.id}"]`);
+          element.classList.toggle("active", active);
+          path.classList.toggle("active", active);
+          path.style.setProperty("--node-color", getMissionColor(mission.id));
+          element.querySelector(".element-state").textContent = active ? mission.activeState : mission.restingState;
+        });
+        document.querySelector("#world-complete").classList.toggle("visible", state.nextGoalUnlocked);
+      }
+
+      function getMissionColor(id) {
+        return { testing: "var(--green)", debugging: "var(--blue)", review: "var(--accent)" }[id];
+      }
+
+      function renderInteraction() {
+        const mission = state.activeMissionId ? MissionLoop.missions[state.activeMissionId] : null;
+        const phases = {
+          "mission-board": ["01", "Available missions"],
+          evidence: ["02", "Work evidence"],
+          reward: ["03", "Reward routing"],
+          transformation: ["04", "World transformation"],
+          "world-complete": ["05", "Goal complete"],
+        };
+        const [number, label] = phases[state.phase];
+        stepNumber.textContent = number;
+        currentStepLabel.textContent = label;
+
+        if (state.phase === "mission-board") {
+          interactionPanel.innerHTML = `
+            <span class="phase-label">Objective / Stabilize frontier</span>
+            <h1>Choose real work</h1>
+            <p>Select any available mission. Each one creates a different reward and changes a different part of the world.</p>`;
+          return;
+        }
+
+        if (state.phase === "evidence") {
+          interactionPanel.innerHTML = `
+            <span class="phase-label">${mission.type} / Evidence ready</span>
+            <h1>Verify the output</h1>
+            <p>${mission.title}</p>
+            <div class="evidence-log">${mission.evidence.map((item) => `<span>${item}</span>`).join("")}</div>
+            <button class="primary-action" type="button" data-action="confirm-evidence">CONFIRM EVIDENCE</button>`;
+          return;
+        }
+
+        if (state.phase === "reward") {
+          interactionPanel.innerHTML = `
+            <span class="phase-label">${mission.type} / Reward calculated</span>
+            <h1>Route the reward</h1>
+            <div class="reward-grid">
+              <div><small>Domain progress</small><strong>${mission.rewards.domain}</strong></div>
+              <div><small>Skill growth</small><strong>${mission.rewards.skill}</strong></div>
+              <div><small>World resource</small><strong>${mission.rewards.resource}</strong></div>
+            </div>
+            <p>${mission.rewards.resource} powers the ${mission.worldElement}.</p>
+            <button class="primary-action" type="button" data-action="apply-transformation">TRANSFORM ${mission.worldElement.toUpperCase()}</button>`;
+          return;
+        }
+
+        if (state.phase === "transformation") {
+          interactionPanel.innerHTML = `
+            <span class="phase-label">${mission.worldElement} / Online</span>
+            <h1>Work changed the world</h1>
+            <div class="change-card"><small>Visible consequence</small><strong>${mission.worldChange}</strong></div>
+            <p>${state.completedMissionIds.length} of 3 frontier systems are active.</p>
+            <button class="primary-action" type="button" data-action="continue">${state.nextGoalUnlocked ? "UNLOCK NEXT GOAL" : "RETURN TO MISSIONS"}</button>`;
+          return;
+        }
+
+        interactionPanel.innerHTML = `
+          <span class="phase-label">Frontier / Stable</span>
+          <h1>Northern Archive unlocked</h1>
+          <p>Testing protected the settlements. Debugging restored energy. Review connected the community. The world retains every consequence.</p>
+          <button class="secondary-action" type="button" data-action="reset">REPLAY IN ANOTHER ORDER</button>`;
+      }
+
+      function renderState() {
+        const activeMission = state.activeMissionId ? MissionLoop.missions[state.activeMissionId].type : "None";
+        const completed = state.completedMissionIds.length
+          ? state.completedMissionIds.map((id) => MissionLoop.missions[id].type).join(", ")
+          : "None";
+        stateGrid.innerHTML = `
+          <div class="state-field"><small>Stability</small><strong>${state.stability} / 33</strong></div>
+          <div class="state-field"><small>Trust</small><strong>${state.trust} / 10</strong></div>
+          <div class="state-field"><small>Active mission</small><strong>${activeMission}</strong></div>
+          <div class="state-field"><small>Completed</small><strong>${state.completedMissionIds.length} / 3</strong></div>
+          <div class="state-field wide"><small>Completed missions</small><strong>${completed}</strong></div>
+          <div class="state-field wide"><small>Last event</small><strong class="event-${state.lastEvent.status === "rejected" ? "rejected" : "ok"}">${state.lastEvent.message}</strong></div>`;
+      }
+
+      function renderScenarios() {
+        scenarioTabs.innerHTML = scenarios.map((scenario) => `
+          <button class="scenario-tab ${scenario.id === activeScenarioId ? "active" : ""}" type="button" data-scenario-id="${scenario.id}">${scenario.label}</button>
+        `).join("");
+        const scenario = scenarios.find((item) => item.id === activeScenarioId);
+        scenarioCopy.textContent = scenario.description;
+        const step = scenario.steps[scenarioStep];
+        guideAction.disabled = !step;
+        guideAction.textContent = step ? `STEP ${scenarioStep + 1} / ${scenario.steps.length}: ${step.label}` : "SCENARIO COMPLETE";
+      }
+
+      missionList.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-mission-id]");
+        if (button) dispatch({ type: "SELECT_MISSION", missionId: button.dataset.missionId });
+      });
+
+      interactionPanel.addEventListener("click", (event) => {
+        const action = event.target.closest("[data-action]")?.dataset.action;
+        if (action === "confirm-evidence") dispatch({ type: "CONFIRM_EVIDENCE" });
+        if (action === "apply-transformation") dispatch({ type: "APPLY_TRANSFORMATION" });
+        if (action === "continue") dispatch({ type: "CONTINUE" });
+        if (action === "reset") dispatch({ type: "RESET" });
+      });
+
+      scenarioTabs.addEventListener("click", (event) => {
+        const tab = event.target.closest("[data-scenario-id]");
+        if (!tab) return;
+        activeScenarioId = tab.dataset.scenarioId;
+        scenarioStep = 0;
+        state = MissionLoop.initialState();
+        render();
+      });
+
+      guideAction.addEventListener("click", () => {
+        const scenario = scenarios.find((item) => item.id === activeScenarioId);
+        const step = scenario.steps[scenarioStep];
+        if (!step) return;
+        state = MissionLoop.reducer(state, step.action);
+        scenarioStep += 1;
+        render();
+      });
+
+      document.querySelector("#reset-action").addEventListener("click", () => dispatch({ type: "RESET" }));
+      render();
+    </script>
+  </body>
+</html>
