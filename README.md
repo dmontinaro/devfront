@@ -29,6 +29,7 @@ These domains can manifest as structures, regions, systems, biomes, infrastructu
 - [Vision Paper](docs/vision-paper.html)
 - [Product and MVP Plan](docs/product-plan.html)
 - [Machine-readable Agent Handoff](docs/product-plan.agent.json)
+- [MVP Domain Model](docs/mvp-domain-model.md)
 
 ## MVP direction
 
