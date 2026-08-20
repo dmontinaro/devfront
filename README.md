@@ -45,7 +45,16 @@ Intentionally excluded from the MVP: 3D exploration, guilds, PvP, company worlds
 
 ## Status
 
-**Concept / Pre-Prototype.** The next step is a playable world prototype that tests the loop `Mission → Completion → Reward → Visible Transformation` with real users.
+**Single-player MVP in development.** The first app slice contains the World Home, three local missions, auditable reward inputs, local progress, and one visible transformation per mission.
+
+## Local development
+
+```sh
+pnpm install
+pnpm dev
+```
+
+Run the focused project checks with `pnpm check`.
 
 ## License
 
